@@ -8,6 +8,4 @@
         "port": 3306,
         "database": "mydatabase"
     }
-
-
 }
