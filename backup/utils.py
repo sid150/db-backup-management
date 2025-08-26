@@ -12,7 +12,14 @@ def get_db_config(db_type):
             raise ValueError(f"Database type {db_type} not supported")
         
         logging.info(f"Database config for {db_type} fetched successfully.")
-        return {f"{db_type}.url": config[db_type]['url'] + "://" + config[db_type]['username'] + ":" + config[db_type]['password'] + "@" + config[db_type]['host'] + "/" + config[db_type]['database']}
+        return {f"{db_type}.url": config[db_type]['url'] + "://" + config[db_type]['username'] + ":" + config[db_type]['password'] +
+                 "@" + config[db_type]['host'] + "/" + config[db_type]['database'],
+                 "username": config[db_type]['username'],
+                 "password": config[db_type]['password'],
+                 "host": config[db_type]['host'],
+                 "port": config[db_type]['port'],
+                 "database": config[db_type]['database']
+            }
         # return config[db_type]
     
     except Exception as e:
