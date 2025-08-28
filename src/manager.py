@@ -72,9 +72,26 @@ class BackupManager:
                 backup_file = self._compress_file(backup_file)
                 print(f"Backup compressed and saved as: {backup_file}")
             
+            # Send success notification
+            try:
+                from notifications import notify_backup_status
+                notify_backup_status("full", backup_file, True)
+            except ImportError:
+                print("Notifications module not available")
+            except Exception as ne:
+                print(f"Failed to send notification: {ne}")
+            
             return backup_file
         except subprocess.CalledProcessError as e:
             print(f"Error creating full backup: {e}")
+            # Send failure notification
+            try:
+                from notifications import notify_backup_status
+                notify_backup_status("full", backup_file, False)
+            except ImportError:
+                print("Notifications module not available")
+            except Exception as ne:
+                print(f"Failed to send notification: {ne}")
             raise
     
     def create_incremental_backup(self, compress: bool = True) -> Path:
@@ -115,9 +132,26 @@ class BackupManager:
                 backup_file = self._compress_file(backup_file)
                 print(f"Backup compressed and saved as: {backup_file}")
             
+            # Send success notification
+            try:
+                from notifications import notify_backup_status
+                notify_backup_status("incremental", backup_file, True)
+            except ImportError:
+                print("Notifications module not available")
+            except Exception as ne:
+                print(f"Failed to send notification: {ne}")
+            
             return backup_file
         except subprocess.CalledProcessError as e:
             print(f"Error creating incremental backup: {e}")
+            # Send failure notification
+            try:
+                from notifications import notify_backup_status
+                notify_backup_status("incremental", backup_file, False)
+            except ImportError:
+                print("Notifications module not available")
+            except Exception as ne:
+                print(f"Failed to send notification: {ne}")
             raise
 
     def restore_backup(self, backup_file: Path) -> None:

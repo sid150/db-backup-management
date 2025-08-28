@@ -164,10 +164,39 @@ def handle_upload(args: argparse.Namespace, manager: BackupManager) -> None:
         
         for backup_file in backup_files:
             print(f"\nUploading {backup_file.name}...")
-            backup_to_cloud(str(backup_file), args.provider, **cloud_args)
+            success = backup_to_cloud(str(backup_file), args.provider, **cloud_args)
+            
+            # Send notification about upload status
+            try:
+                from notifications import notify_backup_status
+                backup_type = "full" if "full" in backup_file.name else "incremental"
+                notify_backup_status(
+                    backup_type=backup_type,
+                    backup_file=backup_file,
+                    success=True,
+                    upload_status={args.provider.upper(): success}
+                )
+            except ImportError:
+                print("Notifications module not available")
+            except Exception as ne:
+                print(f"Failed to send notification: {ne}")
             
     except Exception as e:
         print(f"Error during upload: {str(e)}")
+        # Send failure notification
+        try:
+            from notifications import notify_backup_status
+            backup_type = "full" if "full" in backup_file.name else "incremental"
+            notify_backup_status(
+                backup_type=backup_type,
+                backup_file=backup_file,
+                success=False,
+                upload_status={args.provider.upper(): False}
+            )
+        except ImportError:
+            print("Notifications module not available")
+        except Exception as ne:
+            print(f"Failed to send notification: {ne}")
 
 def handle_restore(args: argparse.Namespace, manager: BackupManager) -> None:
     """Handle restore from backup command."""
