@@ -1,5 +1,4 @@
 {
-
     "mysql": {
         "url": "mysql+pymysql",
         "username": "root",
@@ -7,5 +6,39 @@
         "host": "localhost",
         "port": 3306,
         "database": "mydatabase"
+    },
+    "cloud_storage": {
+        "provider": "s3",
+        "aws": {
+            "access_key_id": "your_aws_access_key",
+            "secret_access_key": "your_aws_secret_key",
+            "region": "us-west-2",
+            "bucket_name": "your-backup-bucket",
+            "backup_prefix": "database-backups/"
+        },
+        "gcs": {
+            "project_id": "your-gcp-project-id",
+            "credentials_file": "/path/to/service-account-key.json",
+            "bucket_name": "your-gcs-bucket",
+            "backup_prefix": "database-backups/"
+        },
+        "azure": {
+            "connection_string": "your_azure_connection_string",
+            "container_name": "your-container-name",
+            "backup_prefix": "database-backups/"
+        }
+    },
+    "notifications": {
+        "slack": {
+            "enabled": true,
+            "webhook_url": "https://hooks.slack.com/services/YOUR/WEBHOOK/URL",
+            "channel": "#database-backups",
+            "username": "Database Backup Bot"
+        }
+    },
+    "backup": {
+        "compression": true,
+        "retention_days": 30,
+        "local_backup_path": "/Users/sidharthjain/db-backup-management/backups"
     }
 }
