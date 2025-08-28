@@ -26,7 +26,7 @@ class BackupManager:
         with open(file_path, 'rb') as f_in:
             with gzip.open(compressed_path, 'wb') as f_out:
                 shutil.copyfileobj(f_in, f_out)
-        # Remove original uncompressed file
+
         os.remove(file_path)
         return compressed_path
     
@@ -71,8 +71,7 @@ class BackupManager:
             if compress:
                 backup_file = self._compress_file(backup_file)
                 print(f"Backup compressed and saved as: {backup_file}")
-            
-            # Send success notification
+
             try:
                 from notifications import notify_backup_status
                 notify_backup_status("full", backup_file, True)
@@ -84,7 +83,7 @@ class BackupManager:
             return backup_file
         except subprocess.CalledProcessError as e:
             print(f"Error creating full backup: {e}")
-            # Send failure notification
+
             try:
                 from notifications import notify_backup_status
                 notify_backup_status("full", backup_file, False)
@@ -100,7 +99,6 @@ class BackupManager:
         last_full_backup = self._get_last_full_backup()
         backup_file = self.incremental_backup_dir / f"incremental_backup_{timestamp}.sql"
         
-        # If the last backup is compressed, decompress it temporarily to get its timestamp
         if last_full_backup.suffix == '.gz':
             temp_file = self.backup_dir / 'temp.sql'
             self._decompress_file(last_full_backup, temp_file)
@@ -132,7 +130,6 @@ class BackupManager:
                 backup_file = self._compress_file(backup_file)
                 print(f"Backup compressed and saved as: {backup_file}")
             
-            # Send success notification
             try:
                 from notifications import notify_backup_status
                 notify_backup_status("incremental", backup_file, True)
@@ -144,7 +141,6 @@ class BackupManager:
             return backup_file
         except subprocess.CalledProcessError as e:
             print(f"Error creating incremental backup: {e}")
-            # Send failure notification
             try:
                 from notifications import notify_backup_status
                 notify_backup_status("incremental", backup_file, False)
@@ -157,7 +153,6 @@ class BackupManager:
     def restore_backup(self, backup_file: Path) -> None:
         """Restore a backup file (can be either full or incremental)."""
         try:
-            # If the backup is compressed, decompress it first
             if backup_file.suffix == '.gz':
                 temp_file = self.backup_dir / 'temp_restore.sql'
                 backup_file = self._decompress_file(backup_file, temp_file)
@@ -179,8 +174,7 @@ class BackupManager:
             print(f"Backup restored successfully from: {backup_file}")
 
             if cleanup_needed:
-                os.remove(backup_file)  # Remove temporary decompressed file
-
+                os.remove(backup_file)  
         except subprocess.CalledProcessError as e:
             print(f"Error restoring backup: {e}")
             raise
@@ -201,17 +195,14 @@ def main():
     backup_manager = BackupManager('mysql')
     
     try:
-        # Create a compressed full backup
         print("\nCreating full backup...")
         full_backup = backup_manager.create_full_backup(compress=True)
         print(f"Full backup created and compressed at: {full_backup}")
-        
-        # Create a compressed incremental backup
+
         print("\nCreating incremental backup...")
         incremental_backup = backup_manager.create_incremental_backup(compress=True)
         print(f"Incremental backup created and compressed at: {incremental_backup}")
         
-        # List all backups
         print("\nListing all backups:")
         full_backups, incr_backups = backup_manager.list_backups()
         print("\nFull backups:")

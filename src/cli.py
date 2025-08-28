@@ -81,11 +81,9 @@ def handle_backup(args: argparse.Namespace, manager: BackupManager) -> Optional[
             cloud_args = {
                 'bucket_name': args.bucket
             }
-            
-            # Add provider-specific arguments
+
             if args.credentials:
                 if args.upload == 's3':
-                    # For S3, expect AWS credentials file
                     with open(args.credentials) as f:
                         import json
                         creds = json.load(f)
@@ -97,7 +95,6 @@ def handle_backup(args: argparse.Namespace, manager: BackupManager) -> Optional[
                 elif args.upload == 'gcs':
                     cloud_args['credentials_path'] = args.credentials
                 elif args.upload == 'azure':
-                    # For Azure, expect connection string in credentials file
                     with open(args.credentials) as f:
                         cloud_args['connection_string'] = f.read().strip()
             
@@ -139,8 +136,7 @@ def handle_upload(args: argparse.Namespace, manager: BackupManager) -> None:
         cloud_args = {
             'bucket_name': args.bucket
         }
-        
-        # Add provider-specific arguments
+
         if args.credentials:
             if args.provider == 's3':
                 with open(args.credentials) as f:
@@ -159,14 +155,13 @@ def handle_upload(args: argparse.Namespace, manager: BackupManager) -> None:
         
         if args.backup == 'latest':
             backup_files = [all_backups[-1]]
-        else:  # 'all'
+        else:  
             backup_files = all_backups
         
         for backup_file in backup_files:
             print(f"\nUploading {backup_file.name}...")
             success = backup_to_cloud(str(backup_file), args.provider, **cloud_args)
-            
-            # Send notification about upload status
+
             try:
                 from notifications import notify_backup_status
                 backup_type = "full" if "full" in backup_file.name else "incremental"
