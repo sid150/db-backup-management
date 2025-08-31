@@ -60,7 +60,6 @@ def notify_backup_status(
     try:
         notifier = SlackNotifier()
         
-        # Calculate backup size in MB
         size_mb = backup_file.stat().st_size / (1024 * 1024) if backup_file.exists() else 0
         
         if success:
@@ -78,7 +77,7 @@ def notify_backup_status(
             f"Size: {size_mb:.2f} MB\n"
         )
         
-        # Add cloud upload status if provided
+
         if upload_status:
             cloud_status = []
             for provider, status in upload_status.items():
@@ -91,9 +90,9 @@ def notify_backup_status(
     except Exception as e:
         print(f"Error sending notification: {str(e)}")
 
-# Example usage
+
 if __name__ == "__main__":
-    # Test notification
+
     test_file = Path("test_backup.sql.gz")
     notify_backup_status(
         backup_type="full",
